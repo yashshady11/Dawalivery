@@ -1,0 +1,6 @@
+module Pods_Dwalivery_DwaliveryTests {
+  umbrella header "Pods-Dwalivery-DwaliveryTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

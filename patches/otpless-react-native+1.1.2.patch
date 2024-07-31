@@ -1,0 +1,25 @@
+diff --git a/node_modules/otpless-react-native/ios/OtplessReactNative.m b/node_modules/otpless-react-native/ios/OtplessReactNative.m
+index d82f3fc..14bdf92 100644
+--- a/node_modules/otpless-react-native/ios/OtplessReactNative.m
++++ b/node_modules/otpless-react-native/ios/OtplessReactNative.m
+@@ -3,7 +3,6 @@
+ 
+ @interface RCT_EXTERN_MODULE(OtplessReactNative, RCTEventEmitter<RCTBridgeModule>)
+ 
+-
+ RCT_EXTERN_METHOD(setLoaderVisibility:(BOOL)isVisible)
+ 
+ RCT_EXTERN_METHOD(showOtplessLoginPage:(NSDictionary *)param
+@@ -20,5 +19,11 @@ RCT_EXTERN_METHOD(startHeadless:(NSDictionary *)request)
+ RCT_EXTERN_METHOD(setWebViewInspectable:(BOOL)isInspectable)
+ 
+ RCT_EXTERN_METHOD(enableOneTap:(BOOL)enable)
+-@end
+ 
++// Add this method
+++ (BOOL)requiresMainQueueSetup
++{
++  return NO;
++}
++
++@end

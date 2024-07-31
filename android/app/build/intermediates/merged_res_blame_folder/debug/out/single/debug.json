@@ -1,35 +1,179 @@
 [
     {
-        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "com.dwalivery.app-main-38:/mipmap-xhdpi/ic_launcher_round.png"
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-hdpi_ic_launcher_background.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-hdpi/ic_launcher_background.png"
     },
     {
-        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "com.dwalivery.app-main-38:/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_home_screen_ordersicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_home_screen_ordersicon.png"
     },
     {
-        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "com.dwalivery.app-main-38:/mipmap-xhdpi/ic_launcher.png"
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_home_screen_labtesticon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_home_screen_labtesticon.png"
     },
     {
-        "merged": "com.dwalivery.app-merged_res-36:/mipmap-hdpi_ic_launcher_round.png.flat",
-        "source": "com.dwalivery.app-main-38:/mipmap-hdpi/ic_launcher_round.png"
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_checkout_screen_rightarrow.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_checkout_screen_rightarrow.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_home_screen_carticon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_home_screen_carticon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable_rn_edit_text_material.xml.flat",
+        "source": "com.dwalivery.app-main-38:/drawable/rn_edit_text_material.xml"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-xxhdpi_node_modules_reactnavigation_elements_src_assets_backicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-xxhdpi/node_modules_reactnavigation_elements_src_assets_backicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xxxhdpi_ic_launcher_monochrome.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xxxhdpi/ic_launcher_monochrome.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-hdpi_ic_launcher_foreground.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-hdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_payment_method_screen_cardicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_payment_method_screen_cardicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xxxhdpi_ic_launcher_background.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xxxhdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_pharmacy_shop_screen_backicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_pharmacy_shop_screen_backicon.png"
     },
     {
         "merged": "com.dwalivery.app-merged_res-36:/mipmap-hdpi_ic_launcher.png.flat",
         "source": "com.dwalivery.app-main-38:/mipmap-hdpi/ic_launcher.png"
     },
     {
-        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xxhdpi_ic_launcher_round.png.flat",
-        "source": "com.dwalivery.app-main-38:/mipmap-xxhdpi/ic_launcher_round.png"
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_node_modules_reactnavigation_elements_src_assets_backicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/node_modules_reactnavigation_elements_src_assets_backicon.png"
     },
     {
-        "merged": "com.dwalivery.app-merged_res-36:/mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "com.dwalivery.app-main-38:/mipmap-mdpi/ic_launcher_round.png"
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_welcome_screen_wavy_background_image.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_welcome_screen_wavy_background_image.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_home_screen_locationicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_home_screen_locationicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_home_screen_homeicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_home_screen_homeicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-xhdpi_node_modules_reactnavigation_elements_src_assets_backicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-xhdpi/node_modules_reactnavigation_elements_src_assets_backicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_pharmacy_shop_screen_ordernowicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_pharmacy_shop_screen_ordernowicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-hdpi_ic_launcher_monochrome.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-hdpi/ic_launcher_monochrome.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_order_placed_screen_orderplaced.gif.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_order_placed_screen_orderplaced.gif"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_order_screen_order_image.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_order_screen_order_image.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_checkout_screen_arrowrighticon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_checkout_screen_arrowrighticon.png"
     },
     {
         "merged": "com.dwalivery.app-merged_res-36:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
         "source": "com.dwalivery.app-main-38:/mipmap-xxxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_coupon_screen_tag.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_coupon_screen_tag.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_pharmacy_shop_screen_noresults.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_pharmacy_shop_screen_noresults.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xxxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xxxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_my_account_screen_addressbook.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_my_account_screen_addressbook.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_home_screen_onlymedicine.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_home_screen_onlymedicine.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_home_screen_doctoricon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_home_screen_doctoricon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_payment_method_screen_cashicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_payment_method_screen_cashicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_welcome_screen_nextbuttonic.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_welcome_screen_nextbuttonic.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-hdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xxhdpi_ic_launcher_foreground.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xxhdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xxhdpi_ic_launcher_monochrome.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xxhdpi/ic_launcher_monochrome.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_welcome_screen_phoneic.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_welcome_screen_phoneic.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_payment_method_screen_upiicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_payment_method_screen_upiicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_checkout_screen_backicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_checkout_screen_backicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-mdpi_ic_launcher_background.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-mdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_my_account_screen_medicineorders.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_my_account_screen_medicineorders.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_home_screen_searchicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_home_screen_searchicon.png"
     },
     {
         "merged": "com.dwalivery.app-merged_res-36:/mipmap-xxhdpi_ic_launcher.png.flat",
@@ -40,7 +184,107 @@
         "source": "com.dwalivery.app-main-38:/mipmap-mdpi/ic_launcher.png"
     },
     {
-        "merged": "com.dwalivery.app-merged_res-36:/drawable_rn_edit_text_material.xml.flat",
-        "source": "com.dwalivery.app-main-38:/drawable/rn_edit_text_material.xml"
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_home_screen_medicineicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_home_screen_medicineicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-hdpi_node_modules_reactnavigation_elements_src_assets_backicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-hdpi/node_modules_reactnavigation_elements_src_assets_backicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_my_account_screen_aboutus.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_my_account_screen_aboutus.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xhdpi_ic_launcher_background.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xhdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_home_screen_pharmacyicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_home_screen_pharmacyicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_checkout_screen_emptycart.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_checkout_screen_emptycart.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xhdpi_ic_launcher_monochrome.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xhdpi/ic_launcher_monochrome.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_home_screen_radiotesticon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_home_screen_radiotesticon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-mdpi_ic_launcher_monochrome.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-mdpi/ic_launcher_monochrome.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_my_account_screen_termsconditions.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_my_account_screen_termsconditions.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_checkout_screen_editicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_checkout_screen_editicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_node_modules_reactnavigation_elements_src_assets_backiconmask.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/node_modules_reactnavigation_elements_src_assets_backiconmask.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_order_screen_noorders.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_order_screen_noorders.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_my_account_screen_helpcentre.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_my_account_screen_helpcentre.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_welcome_screen_logo.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_welcome_screen_logo.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-mdpi_ic_launcher_foreground.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-mdpi/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_home_screen_profileiconblack.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_home_screen_profileiconblack.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_order_screen_medicine_order_image.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_order_screen_medicine_order_image.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_pharmacy_shop_screen_phoneicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_pharmacy_shop_screen_phoneicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-mdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-xxxhdpi_node_modules_reactnavigation_elements_src_assets_backicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-xxxhdpi/node_modules_reactnavigation_elements_src_assets_backicon.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/mipmap-xxhdpi_ic_launcher_background.png.flat",
+        "source": "com.dwalivery.app-main-38:/mipmap-xxhdpi/ic_launcher_background.png"
+    },
+    {
+        "merged": "com.dwalivery.app-merged_res-36:/drawable-mdpi_src_assets_images_pharmacy_shop_screen_locationicon.png.flat",
+        "source": "com.dwalivery.app-main-38:/drawable-mdpi/src_assets_images_pharmacy_shop_screen_locationicon.png"
     }
 ]

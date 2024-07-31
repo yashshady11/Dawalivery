@@ -2,13 +2,14 @@
 manifest
 ADDED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:1:1-29:12
 MERGED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:1:1-29:12
-INJECTED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:2:1-9:12
-INJECTED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:2:1-9:12
-INJECTED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:2:1-9:12
+INJECTED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:2:1-10:12
+INJECTED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:2:1-10:12
+INJECTED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:2:1-10:12
 MERGED from [:react-native-async-storage_async-storage] /Users/yadavyash/Dwalivery/node_modules/@react-native-async-storage/async-storage/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-7:12
 MERGED from [:react-native-community_geolocation] /Users/yadavyash/Dwalivery/node_modules/@react-native-community/geolocation/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-7:12
 MERGED from [:react-native-community_masked-view] /Users/yadavyash/Dwalivery/node_modules/@react-native-community/masked-view/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-7:12
 MERGED from [:react-native-fast-image] /Users/yadavyash/Dwalivery/node_modules/react-native-fast-image/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-7:12
+MERGED from [:react-native-geolocation-service] /Users/yadavyash/Dwalivery/node_modules/react-native-geolocation-service/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-7:12
 MERGED from [:react-native-gesture-handler] /Users/yadavyash/Dwalivery/node_modules/react-native-gesture-handler/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-7:12
 MERGED from [:react-native-linear-gradient] /Users/yadavyash/Dwalivery/node_modules/react-native-linear-gradient/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-7:12
 MERGED from [:react-native-navigation-bar-color] /Users/yadavyash/Dwalivery/node_modules/react-native-navigation-bar-color/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-7:12
@@ -111,7 +112,7 @@ application
 ADDED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:9:5-28:19
 MERGED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:9:5-28:19
 MERGED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:9:5-28:19
-INJECTED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:5:5-8:50
+INJECTED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:5:5-9:50
 MERGED from [com.facebook.react:react-android:0.74.2] /Users/yadavyash/.gradle/caches/transforms-4/716f968cc1e5225035406d1e56ec874f/transformed/jetified-react-android-0.74.2-debug/AndroidManifest.xml:18:5-22:19
 MERGED from [com.facebook.react:react-android:0.74.2] /Users/yadavyash/.gradle/caches/transforms-4/716f968cc1e5225035406d1e56ec874f/transformed/jetified-react-android-0.74.2-debug/AndroidManifest.xml:18:5-22:19
 MERGED from [com.google.android.material:material:1.6.1] /Users/yadavyash/.gradle/caches/transforms-4/452ffdcf9637ac22e3426671d55dd6fb/transformed/material-1.6.1/AndroidManifest.xml:24:5-20
@@ -151,13 +152,15 @@ MERGED from [com.facebook.soloader:soloader:0.10.5] /Users/yadavyash/.gradle/cac
 	android:label
 		ADDED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:11:7-39
 		ADDED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:11:7-39
+	android:debuggable
+		ADDED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:6:9-34
 	tools:ignore
-		ADDED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:8:9-48
+		ADDED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:9:9-48
 	android:roundIcon
 		ADDED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:13:7-52
 		ADDED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:13:7-52
 	tools:targetApi
-		ADDED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:7:9-29
+		ADDED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:8:9-29
 	android:icon
 		ADDED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:12:7-41
 		ADDED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:12:7-41
@@ -168,7 +171,7 @@ MERGED from [com.facebook.soloader:soloader:0.10.5] /Users/yadavyash/.gradle/cac
 		ADDED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:15:7-38
 		ADDED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:15:7-38
 	android:usesCleartextTraffic
-		ADDED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:6:9-44
+		ADDED from /Users/yadavyash/Dwalivery/android/app/src/debug/AndroidManifest.xml:7:9-44
 	android:name
 		ADDED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:10:7-38
 		ADDED from /Users/yadavyash/Dwalivery/android/app/src/main/AndroidManifest.xml:10:7-38
@@ -208,6 +211,8 @@ MERGED from [:react-native-community_masked-view] /Users/yadavyash/Dwalivery/nod
 MERGED from [:react-native-community_masked-view] /Users/yadavyash/Dwalivery/node_modules/@react-native-community/masked-view/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:react-native-fast-image] /Users/yadavyash/Dwalivery/node_modules/react-native-fast-image/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:react-native-fast-image] /Users/yadavyash/Dwalivery/node_modules/react-native-fast-image/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-44
+MERGED from [:react-native-geolocation-service] /Users/yadavyash/Dwalivery/node_modules/react-native-geolocation-service/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-44
+MERGED from [:react-native-geolocation-service] /Users/yadavyash/Dwalivery/node_modules/react-native-geolocation-service/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:react-native-gesture-handler] /Users/yadavyash/Dwalivery/node_modules/react-native-gesture-handler/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:react-native-gesture-handler] /Users/yadavyash/Dwalivery/node_modules/react-native-gesture-handler/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [:react-native-linear-gradient] /Users/yadavyash/Dwalivery/node_modules/react-native-linear-gradient/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-44

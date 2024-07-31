@@ -3,15 +3,17 @@ import { View, StyleSheet } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OrderPlacedScreen = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    // Assuming the GIF duration is 3 seconds
-    const timer = setTimeout(() => {
+    // Assuming the GIF duration is 7.15 seconds
+    const timer = setTimeout(async () => {
+      await AsyncStorage.setItem('orderPlaced', 'true'); // Set the order placed flag
       navigation.navigate('Home'); // Navigate to the home screen after the GIF ends
-    }, 7000); // Duration of the GIF in milliseconds
+    }, 4600); // Duration of the GIF in milliseconds
 
     return () => clearTimeout(timer); // Cleanup the timer
   }, [navigation]);
@@ -43,8 +45,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   gif: {
-    width: '100%',
-    height: '100%',
+    width: '50%',
+    height: '50%',
   },
 });
 

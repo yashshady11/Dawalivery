@@ -80,13 +80,14 @@ const styles = StyleSheet.create({
     marginLeft: 20, // Ensure alignment from the left edge
   },
   logo: {
-    width: 40,
-    height: 70,
+    width: 60,
+    height: 60,
+    marginRight: 10,
+    marginBottom: 10, // Reduce gap between logo and text
   },
   title: {
     color: '#000',
     fontSize: 34,
-    fontWeight: 'semibold',
     marginLeft: 3, // Reduce gap between logo and text
     marginTop: -9, // Increase gap between logo and text
     fontFamily: 'Montserrat-SemiBold',
@@ -99,13 +100,11 @@ const styles = StyleSheet.create({
   subtitle: {
     color: '#000',
     fontSize: 36,
-    fontWeight: 'light',
     fontFamily: 'Montserrat-Light', // Change to lighter font
   },
   subtitleBold: {
-    color: '#000',
+    color: '#178A80',
     fontSize: 36,
-    fontWeight: 'bold',
     fontFamily: 'Montserrat-Bold',
   },
   line: {
@@ -139,7 +138,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#26424D',
+    backgroundColor: '#178A80',
     width: '90%',
     paddingVertical: 15, // Decrease padding
     paddingHorizontal: 10, // Decrease padding

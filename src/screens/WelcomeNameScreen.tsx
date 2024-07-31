@@ -31,7 +31,7 @@ const WelcomeNameScreen = () => {
         <View style={styles.content}>
           <View style={styles.welcomeContainer}>
             <Text style={styles.welcomeText}>Welcome</Text>
-            <ActivityIndicator size="small" color="#26424D" style={styles.loader} />
+            <ActivityIndicator size="small" color="#178A80" style={styles.loader} />
           </View>
           <Text style={styles.nameText}>{capitalizeName(name)}</Text>
         </View>
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
   nameText: {
     fontSize: 48,
-    color: '#26424D',
+    color: '#178A80',
     fontFamily: 'Montserrat-Bold',
     marginTop: 10,
   },

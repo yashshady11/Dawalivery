@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ImageBackground, S
 import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import changeNavigationBarColor from 'react-native-navigation-bar-color';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NameScreen = () => {
   const [name, setName] = useState('');
@@ -13,6 +14,15 @@ const NameScreen = () => {
       changeNavigationBarColor('#FFFFFF', true); // Change the navigation bar color to white
     }
   }, []);
+
+  const handleNextPress = async () => {
+    try {
+      await AsyncStorage.setItem('name', name);
+      navigation.navigate('WelcomeName', { name });
+    } catch (error) {
+      console.error('Failed to save name:', error);
+    }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -40,7 +50,7 @@ const NameScreen = () => {
                   value={name}
                   onChangeText={setName}
                 />
-                <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate('WelcomeName', { name })}>
+                <TouchableOpacity style={styles.nextButton} onPress={handleNextPress}>
                   <Image source={require('../assets/images/welcome_screen/next-button-ic.png')} style={styles.nextButtonIcon} />
                 </TouchableOpacity>
                 <Text style={styles.footerText}>© All Rights Reserved by Dawalivery</Text>
@@ -80,8 +90,8 @@ const styles = StyleSheet.create({
     left: 20,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 60,
+    height: 60,
   },
   contentContainer: {
     flexGrow: 1,
@@ -104,21 +114,18 @@ const styles = StyleSheet.create({
   oneText: {
     fontSize: 36,
     color: '#26424D',
-    fontWeight: 'regular',
     fontFamily: 'Montserrat-Regular',
   },
   lastThingText: {
     fontSize: 48,
-    fontWeight: 'medium',
-    color: '#26424D',
+    color: '#178A80',
     fontFamily: 'Montserrat-Medium',
     marginBottom: 20,
   },
   nameLabel: {
     marginTop: 20,
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#6D6D6D',
+    color: '#1A998E',
     fontFamily: 'Montserrat-Bold',
   },
   nameDescription: {
@@ -137,7 +144,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Regular',
   },
   nextButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#178A80',
     width: 60,
     height: 60,
     borderRadius: 30,

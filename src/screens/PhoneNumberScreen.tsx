@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ImageBackground, S
 import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import changeNavigationBarColor from 'react-native-navigation-bar-color';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PhoneNumberScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState('+91-');
@@ -21,6 +22,15 @@ const PhoneNumberScreen = () => {
     setPhoneNumber(formattedInput);
     if (cleanedInput.length === 10) {
       Keyboard.dismiss();
+    }
+  };
+
+  const handleNextPress = async () => {
+    try {
+      await AsyncStorage.setItem('phoneNumber', phoneNumber);
+      navigation.navigate('Otp');
+    } catch (error) {
+      console.error('Failed to save phone number:', error);
     }
   };
 
@@ -51,7 +61,7 @@ const PhoneNumberScreen = () => {
                   value={phoneNumber}
                   onChangeText={handlePhoneNumberChange}
                 />
-                <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate('Otp')}>
+                <TouchableOpacity style={styles.nextButton} onPress={handleNextPress}>
                   <Image source={require('../assets/images/welcome_screen/next-button-ic.png')} style={styles.nextButtonIcon} />
                 </TouchableOpacity>
                 <Text style={styles.footerText}>© All Rights Reserved by Dawalivery</Text>
@@ -91,8 +101,8 @@ const styles = StyleSheet.create({
     left: 20,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 60,
+    height: 60,
   },
   contentContainer: {
     flexGrow: 1,
@@ -115,21 +125,18 @@ const styles = StyleSheet.create({
   letsText: {
     fontSize: 36,
     color: '#26424D',
-    fontWeight: 'regular',
     fontFamily: 'Montserrat-Regular',
   },
   logInText: {
     fontSize: 48,
-    fontWeight: 'medium',
-    color: '#26424D',
+    color: '#178A80',
     fontFamily: 'Montserrat-Medium',
     marginBottom: 20,
   },
   phoneNumberLabel: {
     marginTop: 20,
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#6D6D6D',
+    color: '#1A998E',
     fontFamily: 'Montserrat-Bold',
   },
   phoneNumberDescription: {
@@ -144,11 +151,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.8,
     borderBottomColor: '#000',
     marginBottom: 50,
-    color: '#000',
+    color: '#178A80',
     fontFamily: 'Montserrat-Regular',
   },
   nextButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#178A80',
     width: 60,
     height: 60,
     borderRadius: 30,

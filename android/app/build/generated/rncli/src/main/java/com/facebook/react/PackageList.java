@@ -19,6 +19,8 @@ import com.reactnativecommunity.geolocation.GeolocationPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
 // react-native-fast-image
 import com.dylanvann.fastimage.FastImageViewPackage;
+// react-native-geolocation-service
+import com.agontuk.RNFusedLocation.RNFusedLocationPackage;
 // react-native-gesture-handler
 import com.swmansion.gesturehandler.RNGestureHandlerPackage;
 // react-native-linear-gradient
@@ -82,6 +84,7 @@ public class PackageList {
       new GeolocationPackage(),
       new RNCMaskedViewPackage(),
       new FastImageViewPackage(),
+      new RNFusedLocationPackage(),
       new RNGestureHandlerPackage(),
       new LinearGradientPackage(),
       new NavigationBarColorPackage(),

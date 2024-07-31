@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image, Dimensions, StatusBar } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomModal from './CustomModal'; // Adjust the path as needed
 
 const { width, height } = Dimensions.get('window');
 const borderColor = '#26424D';
@@ -11,60 +13,178 @@ const borderColor = '#26424D';
 const PharmacyShopScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { pharmacy } = route.params;
+  const { pharmacy = { id: '', name: '', medicines: [] } } = route.params;
+  const isFocused = useIsFocused();
 
   const [itemsSelected, setItemsSelected] = useState(0);
   const [loading, setLoading] = useState(true);
   const [medicineList, setMedicineList] = useState(pharmacy.medicines);
   const [searchQuery, setSearchQuery] = useState('');
   const [addedItems, setAddedItems] = useState({});
+  const [existingPharmacy, setExistingPharmacy] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [itemToAdd, setItemToAdd] = useState(null);
 
   useEffect(() => {
-    // Simulate loading data
-    const timeoutId = setTimeout(() => {
-      setLoading(false);
-    }, 2000); // Adjust the timeout duration as needed
+    const simulateLoading = () => {
+      setLoading(true);
+      const timeoutId = setTimeout(() => {
+        setLoading(false);
+      }, 2000); // Adjust the timeout duration as needed
 
-    return () => clearTimeout(timeoutId); // Cleanup timeout on unmount
+      return () => clearTimeout(timeoutId); // Cleanup timeout on unmount
+    };
+
+    simulateLoading();
   }, []);
 
   useEffect(() => {
-    if (route.params?.updatedItems) {
-      const updatedItems = route.params.updatedItems;
-      setMedicineList((prevList) =>
-        prevList.map((item) => 
-          updatedItems.find((updatedItem) => updatedItem.id === item.id) || item
-        )
-      );
-      const newItemsSelected = updatedItems.reduce((sum, item) => sum + item.count, 0);
-      setItemsSelected(newItemsSelected);
+    const checkExistingCart = async () => {
+      try {
+        const existingItems = await AsyncStorage.getItem('cartItems');
+        if (existingItems) {
+          const parsedItems = JSON.parse(existingItems);
+          console.log('Existing cart items:', parsedItems);
+          if (parsedItems.length > 0 && parsedItems[0].pharmacyName !== pharmacy.name) {
+            console.log('Existing pharmacy in cart:', parsedItems[0].pharmacyName);
+            setExistingPharmacy(parsedItems[0].pharmacyName);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking existing cart:', error);
+      }
+    };
+
+    const loadSelectedItems = async () => {
+      try {
+        const storedItems = await AsyncStorage.getItem(`selectedItems_${pharmacy.id}`);
+        if (storedItems) {
+          const parsedItems = JSON.parse(storedItems);
+          console.log('Loaded selected items:', parsedItems);
+          setMedicineList(parsedItems);
+          const selectedCount = parsedItems.reduce((sum, item) => sum + item.count, 0);
+          setItemsSelected(selectedCount);
+          const newAddedItems = {};
+          parsedItems.forEach(item => {
+            if (item.count > 0) {
+              newAddedItems[item.id] = true;
+            }
+          });
+          setAddedItems(newAddedItems);
+        }
+      } catch (error) {
+        console.error('Error loading selected items:', error);
+      }
+    };
+
+    if (isFocused) {
+      checkExistingCart();
+      loadSelectedItems();
     }
-  }, [route.params?.updatedItems]);
+  }, [isFocused, pharmacy.id]);
+
+  useEffect(() => {
+    const clearSelectedItemsOnOrderPlaced = async () => {
+      const orderPlaced = await AsyncStorage.getItem('orderPlaced');
+      console.log('Order placed:', orderPlaced);
+      if (orderPlaced === 'true') {
+        await AsyncStorage.removeItem(`selectedItems_${pharmacy.id}`);
+        setMedicineList(pharmacy.medicines.map(item => ({ ...item, count: 0 })));
+        setItemsSelected(0);
+        setAddedItems({});
+        await AsyncStorage.removeItem('orderPlaced');
+        console.log('Order placed, cart cleared');
+      }
+    };
+
+    if (isFocused) {
+      clearSelectedItemsOnOrderPlaced();
+    }
+  }, [isFocused, pharmacy.id]);
+
+  const saveSelectedItems = async (items) => {
+    try {
+      await AsyncStorage.setItem(`selectedItems_${pharmacy.id}`, JSON.stringify(items));
+    } catch (error) {
+      console.error('Error saving selected items:', error);
+    }
+  };
+
+  const saveCartItems = async (items) => {
+    try {
+      const cartItems = items.filter(item => item.count > 0).map(item => ({ ...item, pharmacyName: pharmacy.name }));
+      await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+    } catch (error) {
+      console.error('Error saving cart items:', error);
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      console.log('Clearing cart items from AsyncStorage');
+      await AsyncStorage.removeItem('cartItems');
+      await AsyncStorage.removeItem(`selectedItems_${pharmacy.id}`);
+      console.log('Resetting medicine list and state');
+      setMedicineList(pharmacy.medicines.map(item => ({ ...item, count: 0 })));
+      setItemsSelected(0);
+      setAddedItems({});
+      setExistingPharmacy('');
+      console.log('Cart cleared');
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+    }
+  };
+
+  const handleAddItem = (id) => {
+    console.log('Attempting to add item from pharmacy:', pharmacy.name);
+    console.log('Existing pharmacy in cart:', existingPharmacy);
+    if (existingPharmacy && existingPharmacy !== pharmacy.name) {
+      console.log('Showing alert for clearing cart');
+      setItemToAdd(id);
+      setModalVisible(true);
+    } else {
+      console.log('Adding item to cart');
+      addItem(id);
+    }
+  };
+
+  const clearCartAndAddItem = async () => {
+    console.log('Clearing cart and adding item:', itemToAdd);
+    await clearCart();
+    console.log('Adding item after clearing cart');
+    addItem(itemToAdd);
+    setModalVisible(false);
+    setItemToAdd(null);
+  };
 
   const addItem = (id) => {
+    console.log('Adding item:', id);
     setAddedItems((prev) => ({ ...prev, [id]: true }));
     incrementCount(id);
   };
 
   const incrementCount = (id) => {
-    setMedicineList((prevList) =>
-      prevList.map((item) =>
-        item.id === id ? { ...item, count: item.count + 1 } : item
-      )
+    const updatedList = medicineList.map((item) =>
+      item.id === id ? { ...item, count: item.count + 1 } : item
     );
+    console.log('Updated medicine list after increment:', updatedList);
+    setMedicineList(updatedList);
     setItemsSelected(itemsSelected + 1);
+    saveSelectedItems(updatedList);
+    saveCartItems(updatedList);
   };
 
   const decrementCount = (id) => {
-    setMedicineList((prevList) =>
-      prevList.map((item) =>
-        item.id === id && item.count > 0
-          ? { ...item, count: item.count - 1 }
-          : item
-      )
+    const updatedList = medicineList.map((item) =>
+      item.id === id && item.count > 0
+        ? { ...item, count: item.count - 1 } : item
     );
+    console.log('Updated medicine list after decrement:', updatedList);
+    setMedicineList(updatedList);
     setItemsSelected(itemsSelected > 0 ? itemsSelected - 1 : 0);
     setAddedItems((prev) => (prev[id] && medicineList.find(item => item.id === id).count === 1 ? { ...prev, [id]: false } : prev));
+    saveSelectedItems(updatedList);
+    saveCartItems(updatedList);
   };
 
   const filteredMedicines = medicineList.filter((item) =>
@@ -99,7 +219,7 @@ const PharmacyShopScreen = () => {
       ) : (
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => addItem(item.id)}
+          onPress={() => handleAddItem(item.id)}
         >
           <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
@@ -117,29 +237,34 @@ const PharmacyShopScreen = () => {
         setMedicineList(updatedList);
         const newItemsSelected = updatedList.reduce((sum, item) => sum + item.count, 0);
         setItemsSelected(newItemsSelected);
-  
+
         const newAddedItems = {};
         updatedList.forEach(item => {
           newAddedItems[item.id] = item.count > 0;
         });
         setAddedItems(newAddedItems);
-      }
+        saveSelectedItems(updatedList);
+        saveCartItems(updatedList);
+      },
+      pharmacyName: pharmacy.name,
+      pharmacyAddress: pharmacy.address,
+      pharmacyid: pharmacy.id // Pass the pharmacy name and id here
     });
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar hidden={false} backgroundColor={'#1B2E39'} />
+      <StatusBar hidden={false} backgroundColor={'#178A80'} />
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.locationContainer}>
             {loading ? (
               <SkeletonPlaceholder>
-                <SkeletonPlaceholder.Item width={20} height={20} borderRadius={10} />
+                <SkeletonPlaceholder.Item width={20} height={20} borderRadius={10} marginTop={15} marginRight={5} />
               </SkeletonPlaceholder>
             ) : (
               <Image
-                source={require('../assets/images/pharmacy_shop_screen/location-icon.png')}
+                source={require('../assets/images/home_screen/location-icon.png')}
                 style={styles.locationIcon}
               />
             )}
@@ -159,10 +284,10 @@ const PharmacyShopScreen = () => {
           </View>
           {loading ? (
             <SkeletonPlaceholder>
-              <SkeletonPlaceholder.Item width={40} height={40} borderRadius={20} />
+              <SkeletonPlaceholder.Item width={40} height={40} borderRadius={20} marginRight={15} />
             </SkeletonPlaceholder>
           ) : (
-            <TouchableOpacity style={styles.profileIconContainer}>
+            <TouchableOpacity style={styles.profileIconContainer} onPress={() => navigation.navigate('MyAccount')}>
               <Image
                 source={require('../assets/images/home_screen/profile-icon-black.png')}
                 style={styles.profileIcon}
@@ -189,7 +314,7 @@ const PharmacyShopScreen = () => {
               </SkeletonPlaceholder>
             ) : (
               <>
-                <Text style={styles.pharmacyName}>DS Medi World</Text>
+                <Text style={styles.pharmacyName}>{pharmacy.name}</Text>
                 <Text style={styles.pharmacyAddress}>
                   Shop No. 22, Model Town, Rewari, Haryana (123401)
                 </Text>
@@ -233,7 +358,7 @@ const PharmacyShopScreen = () => {
             <TextInput
               style={styles.searchInput}
               placeholder="Search medicine name"
-              placeholderTextColor="#888"
+              placeholderTextColor="#FFF"
               value={searchQuery}
               onChangeText={(text) => setSearchQuery(text)}
             />
@@ -242,7 +367,6 @@ const PharmacyShopScreen = () => {
       </View>
       <View style={styles.medicineListContainer}>
         {loading ? (
-          // Skeleton effect while loading
           <SkeletonPlaceholder>
             {Array(6).fill(0).map((_, index) => (
               <SkeletonPlaceholder.Item key={index} width={'80%'} height={80} borderRadius={10} marginBottom={20} marginLeft={40} />
@@ -284,6 +408,14 @@ const PharmacyShopScreen = () => {
           </TouchableOpacity>
         </View>
       )}
+      <CustomModal
+        visible={modalVisible}
+        onClose={() => {
+          setModalVisible(false);
+          setItemToAdd(null);
+        }}
+        onConfirm={clearCartAndAddItem}
+      />
     </SafeAreaView>
   );
 };
@@ -291,10 +423,10 @@ const PharmacyShopScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1B2E39',
+    backgroundColor: '#178A80',
   },
   header: {
-    backgroundColor: '#1B2E39',
+    backgroundColor: '#178A80',
     paddingBottom: 10,
     paddingTop: 10,
     paddingHorizontal: 20,
@@ -320,6 +452,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-SemiBold',
     marginLeft: 5,
   },
+  locationTextContainer: {
+    marginLeft: 5,
+  },
   locationText: {
     fontSize: RFPercentage(2.2),
     color: '#fff',
@@ -327,7 +462,7 @@ const styles = StyleSheet.create({
   },
   profileIconContainer: {
     padding: 10,
-    borderRadius: 20,
+    borderRadius: 30,
     backgroundColor: '#FFF',
   },
   profileIcon: {
@@ -355,7 +490,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Bold',
   },
   pharmacyAddress: {
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.5),
     color: '#A8B6C1',
     fontFamily: 'Montserrat-Regular',
   },
@@ -373,7 +508,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2C3E50',
+    backgroundColor: 'rgba(196, 196, 196, 0.2)',
     borderRadius: 30,
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -389,7 +524,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: RFPercentage(2),
-    color: '#888',
+    color: '#FFF',
     fontFamily: 'Montserrat-Regular',
   },
   medicineListContainer: {
@@ -422,12 +557,12 @@ const styles = StyleSheet.create({
   medicinePrice: {
     fontSize: RFPercentage(2),
     color: '#000',
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: 'Montserrat-Medium',
   },
   medicineDetailsLink: {
-    fontSize: RFPercentage(1.8),
+    fontSize: RFPercentage(1.6),
     color: '#2C3E50',
-    fontFamily: 'Montserrat-SemiBold',
+    fontFamily: 'Montserrat-Light',
     marginTop: 5,
     textDecorationLine: 'underline',
   },
@@ -437,11 +572,11 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 15,
     borderWidth: 2,
-    borderColor: borderColor,
+    borderColor: '#000',
   },
   addButtonText: {
-    color: borderColor,
-    fontFamily: 'Montserrat-Bold',
+    color: '#1A998E',
+    fontFamily: 'Montserrat-SemiBold',
     fontSize: RFPercentage(2.2),
   },
   medicineCounter: {
@@ -456,11 +591,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: borderColor,
+    borderColor: '#000',
   },
   counterButtonText: {
     fontSize: RFPercentage(2.5),
-    color: borderColor,
+    color: '#1A998E',
     fontFamily: 'Montserrat-Bold',
     lineHeight: 26, // Ensure text is vertically centered
   },
@@ -468,7 +603,7 @@ const styles = StyleSheet.create({
     width: 45, // Fixed width to prevent layout shift
     textAlign: 'center',
     fontSize: RFPercentage(2.5),
-    color: '#000',
+    color: '#1A998E',
     fontFamily: 'Montserrat-Medium',
   },
   noResultsContainer: {
@@ -491,7 +626,7 @@ const styles = StyleSheet.create({
     bottom: 10, // Adding space at the bottom
     left: 10, // Adding space on the left
     right: 10, // Adding space on the right
-    backgroundColor: '#1B2E39',
+    backgroundColor: '#178A80',
     borderRadius: 20, // Making the bottom bar rounded
     flexDirection: 'row',
     alignItems: 'center',
@@ -516,7 +651,7 @@ const styles = StyleSheet.create({
   orderButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2C3E50',
+    backgroundColor: '#1A998E',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 30,

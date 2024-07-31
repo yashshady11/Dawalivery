@@ -111,8 +111,8 @@ const styles = StyleSheet.create({
     left: 20,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 60,
+    height: 60,
   },
   contentContainer: {
     flexGrow: 1,
@@ -135,21 +135,18 @@ const styles = StyleSheet.create({
   letsText: {
     fontSize: 36,
     color: '#26424D',
-    fontWeight: 'regular',
     fontFamily: 'Montserrat-Regular',
   },
   logInText: {
     fontSize: 48,
-    fontWeight: 'medium',
-    color: '#26424D',
+    color: '#178A80',
     fontFamily: 'Montserrat-Medium',
     marginBottom: 20,
   },
   otpLabel: {
     marginTop: 20,
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#6D6D6D',
+    color: '#1A998E',
     fontFamily: 'Montserrat-Bold',
   },
   otpDescription: {
@@ -175,7 +172,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Regular',
   },
   nextButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#178A80',
     width: 60,
     height: 60,
     borderRadius: 30,

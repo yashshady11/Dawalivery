@@ -1,0 +1,6 @@
+module Pods_Dwalivery {
+  umbrella header "Pods-Dwalivery-umbrella.h"
+
+  export *
+  module * { export * }
+}

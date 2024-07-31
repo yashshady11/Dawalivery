@@ -1,32 +1,35 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, StatusBar, FlatList, Platform, PermissionsAndroid } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import { RFPercentage } from 'react-native-responsive-fontsize';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
 const services = [
-  { id: '1', title: 'Medicine', description: 'Order Medicines from 12 Stores near you.', icon: require('../assets/images/home_screen/medicine-icon.png'), bgColor: '#EAE6FA' },
-  { id: '2', title: 'Lab Test', description: 'Book Blood Test, LFT, Urine culture and more.', icon: require('../assets/images/home_screen/lab-test-icon.png'), bgColor: '#FFF2E5' },
-  { id: '3', title: 'Radio Test', description: 'Book Ultrasound, MRI, X-Ray and more.', icon: require('../assets/images/home_screen/radio-test-icon.png'), bgColor: '#EBFDF2' },
-  { id: '4', title: 'Doctor', description: 'Look for doctors near you.', icon: require('../assets/images/home_screen/doctor-icon.png'), bgColor: '#F0FDF6' },
+  { id: '1', title: 'Medicine', description: 'Order Medicines from 12 Stores near you.', icon: require('../assets/images/home_screen/medicine-icon.png'), bgColor: '#FFFFFF' },
+  { id: '2', title: 'Lab Test', description: 'Book Blood Test, LFT, Urine culture and more.', icon: require('../assets/images/home_screen/lab-test-icon.png'), bgColor: '#FFFFFF' },
+  { id: '3', title: 'Radio Test', description: 'Book Ultrasound, MRI, X-Ray and more.', icon: require('../assets/images/home_screen/radio-test-icon.png'), bgColor: '#FFFFFF' },
+  { id: '4', title: 'Doctor', description: 'Look for doctors near you.', icon: require('../assets/images/home_screen/doctor-icon.png'), bgColor: '#FFFFFF' },
 ];
 
 const promoBanners = [
   { id: '1', text: 'FREE', subText: 'Get free delivery on order above Rs.199' },
   { id: '2', text: '15OFF', subText: 'Get 15% off on all eligible medicines' },
   { id: '3', text: '5OFF', subText: 'Get 5% off on all cosmetic products' },
-  // Add more banners as needed
 ];
 
 const HomeScreen = () => {
   const [location, setLocation] = useState('Fetching location...');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeRoute, setActiveRoute] = useState('Home');
+  const [orderCount, setOrderCount] = useState(0); // State to track order count
+  const [cartItems, setCartItems] = useState([]); // State to track cart items
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
   const carouselRef = useRef(null);
 
   useEffect(() => {
@@ -57,51 +60,106 @@ const HomeScreen = () => {
     };
 
     const preventGoingBack = navigation.addListener('beforeRemove', (e) => {
-        if (activeRoute === 'Home') {
-            e.preventDefault();
-        }
-        });
+      if (activeRoute === 'Home') {
+        e.preventDefault();
+      }
+    });
 
     const getLocation = () => {
-        Geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            console.log('Latitude:', latitude, 'Longitude:', longitude); // Debug log
-      
-            // Retry fetching location data if it fails
-            const fetchLocationData = async (retryCount = 5) => {
-              for (let i = 0; i < retryCount; i++) {
-                try {
-                  const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
-                  console.log(response.data.display_name); // Debug log
-                  if (response.data && response.data.display_name) {
-                    console.log(response.data.display_name); // Debug log
-                    const address = response.data.display_name;
-                    setLocation(address);
-                    return;
-                  } else {
-                    console.log('No results found for the provided coordinates'); // Debug log
-                  }
-                } catch (error) {
-                  console.error('Error fetching location:', error); // Debug log
+      Geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+
+          const fetchLocationData = async (retryCount = 5) => {
+            for (let i = 0; i < retryCount; i++) {
+              try {
+                const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
+                if (response.data && response.data.display_name) {
+                  const address = response.data.display_name;
+                  setLocation(address);
+                  return;
                 }
-                // Wait for a second before retrying
-                await new Promise(resolve => setTimeout(resolve, 1000));
+              } catch (error) {
+                console.error('Error fetching location:', error);
               }
-              setLocation('Unable to fetch location');
-            };
-      
-            fetchLocationData();
-          },
-          (error) => {
-            setLocation('Location access denied');
-            console.error('Error accessing location:', error); // Debug log
-          },
-          { enableHighAccuracy: true, timeout: 30000, maximumAge: 10000 }, // Increase timeout to 30 seconds
-        );
-      };
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            setLocation('Unable to fetch location');
+          };
+
+          fetchLocationData();
+        },
+        (error) => {
+          setLocation('Location access denied');
+          console.error('Error accessing location:', error);
+        },
+        { enableHighAccuracy: true, timeout: 30000, maximumAge: 10000 },
+      );
+    };
+
     requestLocationPermission();
-  }, []);
+
+    if (isFocused) {
+      setActiveRoute('Home');
+    }
+
+    const fetchOrders = async () => {
+      try {
+        const orders = await AsyncStorage.getItem('orders');
+        if (orders) {
+          const ordersArray = JSON.parse(orders);
+          setOrderCount(ordersArray.length);
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    };
+
+    const fetchCartItems = async () => {
+      try {
+        const items = await AsyncStorage.getItem('cartItems');
+        if (items) {
+          setCartItems(JSON.parse(items));
+        }
+      } catch (error) {
+        console.error('Error fetching cart items:', error);
+      }
+    };
+
+    fetchOrders();
+    fetchCartItems();
+  }, [isFocused]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const clearCartOnOrderPlaced = async () => {
+        const orderPlaced = await AsyncStorage.getItem('orderPlaced');
+        if (orderPlaced === 'true') {
+          // Get all pharmacy IDs
+          const pharmacies = await AsyncStorage.getItem('pharmacies');
+          console.log('Pharmacies:', pharmacies)
+          if (pharmacies) {
+            const pharmacyIds = JSON.parse(pharmacies);
+            // Clear selected items for each pharmacy
+            console.log('PharmacyIds:', pharmacyIds)
+            for (const pharmacyId of pharmacyIds) {
+              console.log(`Clearing selected items for pharmacy ${pharmacyId}`)
+              await AsyncStorage.removeItem(`selectedItems_${pharmacyId}`);
+            }
+          }
+          await AsyncStorage.removeItem('cartItems');
+          await AsyncStorage.removeItem('checkoutData');
+          await AsyncStorage.removeItem('orderPlaced');
+          setCartItems([]);
+          console.log('Cart, checkout data, and selected items for all pharmacies cleared');
+        }
+      };
+
+      if (isFocused) {
+        clearCartOnOrderPlaced();
+      }
+    }, [isFocused])
+  );
 
   const renderPromoBanner = ({ item }) => (
     <View style={styles.promoBanner}>
@@ -115,7 +173,8 @@ const HomeScreen = () => {
       style={[styles.serviceItem, { backgroundColor: item.bgColor }]}
       onPress={() => {
         if (item.title === 'Medicine') {
-          navigation.navigate('PharmacyList', { location }); // Pass location data to PharmacyListScreen
+          navigation.navigate('PharmacyList', { location });
+          setActiveRoute('PharmacyList');
         } else {
           // Handle other service item navigation here
         }
@@ -136,7 +195,7 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar hidden={false} backgroundColor={'#1B2E39'} />
+      <StatusBar hidden={false} backgroundColor={'#178A80'} />
       <View style={styles.header}>
         <View style={styles.locationContainer}>
           <Image source={require('../assets/images/home_screen/location-icon.png')} style={styles.locationIcon} />
@@ -145,8 +204,11 @@ const HomeScreen = () => {
             <Text style={styles.locationText}>{location}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.profileIconContainer}>
-          <Image source={require('../assets/images/home_screen/profile-icon-black.png')} style={styles.profileIcon} />
+        <TouchableOpacity style={styles.profileIconContainer} onPress={() => navigation.navigate('MyAccount')}>
+          <Image
+            source={require('../assets/images/home_screen/profile-icon-black.png')}
+            style={styles.profileIcon}
+          />
         </TouchableOpacity>
       </View>
       <View style={styles.mainContainer}>
@@ -166,7 +228,7 @@ const HomeScreen = () => {
           pagingEnabled
           snapToAlignment="center"
           decelerationRate="fast"
-          snapToInterval={width * 0.9} // Make sure the interval matches the width of the promo banner
+          snapToInterval={width}
           contentContainerStyle={styles.carouselContent}
           ref={carouselRef}
           onScroll={handleScroll}
@@ -199,21 +261,31 @@ const HomeScreen = () => {
       <View style={styles.bottomNavigation}>
         <TouchableOpacity style={styles.navButton} onPress={() => { setActiveRoute('Home'); navigation.navigate('Home'); }}>
           <View style={[styles.navIconContainer, activeRoute === 'Home' && styles.activeNavButton]}>
-            <Image source={require('../assets/images/home_screen/home-icon.png')} style={styles.navIcon} />
+            <Image source={require('../assets/images/home_screen/home-icon.png')} style={[styles.navIcon, activeRoute === 'Home' && styles.activeNavIcon]} />
           </View>
-          <Text style={styles.navText}>Home</Text>
+          <Text style={[styles.navText, activeRoute === 'Home' && styles.activeNavText]}>Home</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => { setActiveRoute('OrderBasket'); navigation.navigate('OrderBasket'); }}>
-          <View style={[styles.navIconContainer, activeRoute === 'OrderBasket' && styles.activeNavButton]}>
-            <Image source={require('../assets/images/home_screen/cart-icon.png')} style={styles.navIcon} />
+        <TouchableOpacity style={styles.navButton} onPress={() => { setActiveRoute('PharmacyList'); navigation.navigate('PharmacyList', { location });
+ }}>
+          <View style={[styles.navIconContainer, activeRoute === 'PharmacyList' && styles.activeNavButton]}>
+            <Image source={require('../assets/images/home_screen/only-medicine.png')} style={[styles.navIcon, activeRoute === 'PharmacyList' && styles.activeNavIcon]} />
           </View>
-          <Text style={styles.navText}>Cart</Text>
+          <Text style={[styles.navText, activeRoute === 'PharmacyList' && styles.activeNavText]}>Get Medicine</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => { setActiveRoute('Profile'); navigation.navigate('Profile'); }}>
-          <View style={[styles.navIconContainer, activeRoute === 'Profile' && styles.activeNavButton]}>
-            <Image source={require('../assets/images/home_screen/profile-icon.png')} style={styles.navIcon} />
+        <TouchableOpacity style={styles.navButton} onPress={() => { setActiveRoute('Checkout'); navigation.navigate('Checkout', { selectedItems: cartItems, onUpdateItems: setCartItems }); }}>
+          <View style={[styles.navIconContainer, activeRoute === 'Checkout' && styles.activeNavButton]}>
+            <Image source={require('../assets/images/home_screen/cart-icon.png')} style={[styles.navIcon, activeRoute === 'Checkout' && styles.activeNavIcon]} />
           </View>
-          <Text style={styles.navText}>Profile</Text>
+          <Text style={[styles.navText, activeRoute === 'Checkout' && styles.activeNavText]}>Cart</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navButton} onPress={() => { setActiveRoute('OrderScreen'); navigation.navigate('OrderScreen'); }}>
+          <View style={[styles.navIconContainer, activeRoute === 'OrderScreen' && styles.activeNavButton]}>
+            <Image source={require('../assets/images/home_screen/orders-icon.png')} style={[styles.navIcon, activeRoute === 'OrderScreen' && styles.activeNavIcon]} />
+            {orderCount > 0 && ( // Show badge if there are orders
+              <View style={styles.redDot} />
+            )}
+          </View>
+          <Text style={[styles.navText, activeRoute === 'OrderScreen' && styles.activeNavText]}>My Orders</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -223,10 +295,10 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1B2E39',
+    backgroundColor: '#178A80',
   },
   header: {
-    backgroundColor: '#1B2E39',
+    backgroundColor: '#178A80',
     paddingBottom: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -244,13 +316,13 @@ const styles = StyleSheet.create({
   },
   locationTextContainer: {
     marginLeft: 5,
-    maxWidth: width - 130, // Adjust the max width to prevent overlap with the profile icon
+    maxWidth: width - 130,
   },
   locationIcon: {
     width: 20,
     height: 20,
-    resizeMode: 'contain', // Ensure the image is fully visible
-    marginVertical: 5, // Add vertical margin to ensure it's not cut off
+    resizeMode: 'contain',
+    marginVertical: 5,
   },
   locationText: {
     fontSize: 14,
@@ -260,8 +332,8 @@ const styles = StyleSheet.create({
   },
   profileIconContainer: {
     padding: 10,
-    borderRadius: 20,
-    backgroundColor: '#FFF',
+    borderRadius: 30,
+    backgroundColor: '#FFFFFF',
   },
   profileIcon: {
     width: 24,
@@ -281,8 +353,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: {
-    width: 80,
-    height: 80,
+    marginRight: 20,
+    width: 60,
+    height: 60,
   },
   logoText: {
     fontSize: RFPercentage(3),
@@ -291,7 +364,7 @@ const styles = StyleSheet.create({
   },
   subtitleText: {
     fontSize: RFPercentage(2),
-    color: '#A8B6C1',
+    color: '#3B3B3B',
     fontFamily: 'Montserrat-Regular',
   },
   promoBanner: {
@@ -300,19 +373,19 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     height: 100,
-    width: width * 0.9, // Adjust the banner width to match the screen width with padding
-    marginHorizontal: (width * 0.1) / 2, // Ensure proper centering
+    width: width * 0.9,
+    marginHorizontal: (width * 0.1) / 2,
     flexDirection: 'row',
     alignItems: 'center',
   },
   promoText: {
-    fontSize: RFPercentage(3.5), // Responsive font size
+    fontSize: RFPercentage(3.5),
     color: '#fff',
     fontFamily: 'Montserrat-Bold',
     flex: 1.5,
   },
   promoSubText: {
-    fontSize: RFPercentage(2), // Responsive font size
+    fontSize: RFPercentage(2),
     color: '#fff',
     fontFamily: 'Montserrat-Medium',
     marginLeft: 10,
@@ -321,7 +394,7 @@ const styles = StyleSheet.create({
   indicatorContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginVertical: height * 0.01, // Dynamic margin based on screen height
+    marginVertical: height * 0.01,
   },
   indicator: {
     width: 8,
@@ -346,8 +419,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   servicesSubtitle: {
-    fontSize: RFPercentage(2),
-    color: '#A8B6C1',
+    fontSize: RFPercentage(1.6),
+    color: '#3B3B3B',
     fontFamily: 'Montserrat-Regular',
     marginBottom: 20,
   },
@@ -361,10 +434,12 @@ const styles = StyleSheet.create({
   serviceItem: {
     width: (width / 2) - 30,
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 20,
     marginBottom: 20,
     alignItems: 'flex-start',
     paddingHorizontal: 10,
+    borderColor: '#E9E9E9',
+    borderWidth: 1,
   },
   serviceIcon: {
     width: 40,
@@ -381,22 +456,22 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   serviceDescription: {
-    fontSize: RFPercentage(1.8),
-    color: '#A8B6C1',
+    fontSize: RFPercentage(1.4),
+    color: '#3B3B3B',
     fontFamily: 'Montserrat-Regular',
     textAlign: 'left',
   },
   bottomNavigation: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#1B2E39',
+    backgroundColor: '#FFFFFF',
     paddingVertical: 10,
-    marginHorizontal: 40, // Decreased width by increasing margins
-    borderRadius: 40,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     position: 'absolute',
-    bottom: 10,
-    left: 20,
-    right: 20,
+    bottom: 0,
+    left: 0,
+    right: 0,
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -416,28 +491,29 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
   },
+  activeNavIcon: {
+    tintColor: '#1B2E39', // Active icon color
+  },
   navText: {
     fontSize: RFPercentage(1.8),
-    color: '#fff',
+    color: '#000000',
     fontFamily: 'Montserrat-Regular',
     marginTop: 5,
   },
-  activeNavButton: {
-    backgroundColor: 'rgba(217, 217, 217, 0.3)',
-    borderRadius: 25, // Ensures the background is a circle
+  activeNavText: {
+    color: '#1B2E39', // Active text color
   },
-  activeDot: {
+  activeNavButton: {
+    backgroundColor: 'rgba(200, 200, 200, 0.5)', // Light grey background for the active button
+  },
+  redDot: {
     position: 'absolute',
-    bottom: -10,
-    left: '50%',
-    transform: [{ translateX: -4 }],
+    top: -3,
+    right: -3,
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#fff',
-  },
-  carouselContent: {
-    paddingHorizontal: 0,
+    backgroundColor: 'red',
   },
 });
 

@@ -4,7 +4,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-import LinearGradient from 'react-native-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 const deliveryFee = 20;
@@ -26,16 +26,23 @@ const SkeletonLoader = () => (
 const CheckoutScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { selectedItems, onUpdateItems } = route.params;
+  const { selectedItems, onUpdateItems, pharmacyAddress, pharmacyName, pharmacyid } = route.params;
 
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [discount, setDiscount] = useState(0);
-  const [items, setItems] = useState(selectedItems);
+  const [deliveryDiscount, setDeliveryDiscount] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [items, setItems] = useState(selectedItems || []);
   const [loading, setLoading] = useState(true);
+  const [selectedAddress, setSelectedAddress] = useState(null);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', () => {
-      onUpdateItems(items);
+      if (onUpdateItems) {
+        onUpdateItems(items);
+      }
+      saveCartItems(items);
+      saveCheckoutData();
     });
 
     // Simulate loading time
@@ -44,17 +51,75 @@ const CheckoutScreen = () => {
     }, 2000);
 
     return unsubscribe;
+  }, [items, selectedAddress, couponCode, paymentMethod]);
+
+  useEffect(() => {
+    if (route.params?.coupon) {
+      applyCoupon(route.params.coupon);
+    }
+    if (route.params?.paymentMethod) {
+      setPaymentMethod(route.params.paymentMethod);
+    }
+    if (route.params?.selectedAddress) {
+      setSelectedAddress(route.params.selectedAddress);
+    }
+  }, [route.params?.coupon, route.params?.paymentMethod, route.params?.selectedAddress]);
+
+  useEffect(() => {
+    if (couponCode) {
+      applyCoupon({ code: couponCode, type: couponCode === 'FREEDEL' ? 'delivery' : 'percentage', value: couponCode === '15OFF' ? 15 : 20 });
+    }
   }, [items]);
+
+  const saveCartItems = async (items) => {
+    try {
+      await AsyncStorage.setItem('cartItems', JSON.stringify(items));
+    } catch (error) {
+      console.error('Error saving cart items:', error);
+    }
+  };
+
+  const saveCheckoutData = async () => {
+    try {
+      const checkoutData = {
+        selectedAddress,
+        couponCode,
+        paymentMethod,
+      };
+      await AsyncStorage.setItem('checkoutData', JSON.stringify(checkoutData));
+    } catch (error) {
+      console.error('Error saving checkout data:', error);
+    }
+  };
+
+  const loadCheckoutData = async () => {
+    try {
+      const data = await AsyncStorage.getItem('checkoutData');
+      if (data) {
+        const { selectedAddress, couponCode, paymentMethod } = JSON.parse(data);
+        setSelectedAddress(selectedAddress);
+        setCouponCode(couponCode);
+        setPaymentMethod(paymentMethod);
+      }
+    } catch (error) {
+      console.error('Error loading checkout data:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadCheckoutData();
+  }, []);
 
   const itemTotal = items.reduce((total, item) => total + (item.price * item.count), 0);
   const toPay = itemTotal + deliveryFee - discount;
+  const finalToPay = deliveryDiscount ? toPay - deliveryFee : toPay;
 
   const handlePaymentMethodChange = () => {
-    alert('Change Payment Method functionality to be implemented');
+    navigation.navigate('PaymentMethodScreen', { currentMethod: paymentMethod });
   };
 
   const handleApplyCoupon = () => {
-    alert('Apply Coupon functionality to be implemented');
+    navigation.navigate('CouponScreen');
   };
 
   const handleIncrement = (id) => {
@@ -73,7 +138,12 @@ const CheckoutScreen = () => {
         "Are you sure you want to remove this medicine?",
         [
           { text: "No", onPress: () => {}, style: "cancel" },
-          { text: "Yes", onPress: () => removeItem(id) }
+          { text: "Yes", onPress: () => {
+            removeItem(id);
+            if (items.length === 1) {
+              navigation.navigate('PharmacyShopScreen', { pharmacy: { id: pharmacyid, name: pharmacyName, medicines: [] } });
+            }
+          }}
         ],
         { cancelable: false }
       );
@@ -84,7 +154,7 @@ const CheckoutScreen = () => {
         )
       );
     }
-  };
+  };  
 
   const removeItem = (id) => {
     setItems((prevItems) => 
@@ -94,10 +164,58 @@ const CheckoutScreen = () => {
     );
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
+    const newOrder = {
+      id: Date.now().toString(),
+      pharmacyName: pharmacyName,
+      pharmacyAddress: pharmacyAddress, // Pharmacy address
+      deliveryAddress: selectedAddress ? selectedAddress.details : 'N/A', // Use the selected address details for delivery
+      items: items.map((item) => ({
+        name: item.name,
+        quantity: item.count,
+      })),
+      totalAmount: finalToPay,
+      couponCode: couponCode,
+      itemTotal: itemTotal,
+      discount: discount,
+      deliveryFee: deliveryDiscount ? 0 : deliveryFee,
+      deliveryDiscount: deliveryDiscount, // Add this to ensure delivery discount info is passed
+      paymentMethod: paymentMethod,
+      date: new Date().toLocaleString(),
+      pharmacyid: pharmacyid
+    };
+
+    console.log(typeof new Date().toLocaleString())
+
+    try {
+      const existingOrders = await AsyncStorage.getItem('orders');
+      const orders = existingOrders ? JSON.parse(existingOrders) : [];
+      orders.push(newOrder);
+      await AsyncStorage.setItem('orders', JSON.stringify(orders));
+    } catch (error) {
+      console.error('Error saving order:', error);
+    }
+
     navigation.navigate('OrderPlaced');
   };
-  
+
+  const applyCoupon = (coupon) => {
+    const total = items.reduce((total, item) => total + (item.price * item.count), 0);
+    if (coupon.type === 'percentage') {
+      const discountValue = (total * coupon.value) / 100;
+      setDiscount(discountValue);
+    } else if (coupon.type === 'delivery') {
+      setDeliveryDiscount(true);
+    }
+    setCouponCode(coupon.code);
+  };
+
+  const removeCoupon = () => {
+    setDiscount(0);
+    setDeliveryDiscount(false);
+    setCouponCode('');
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.medicineItem}>
       <Text style={styles.medicineName}>{item.name}</Text>
@@ -129,67 +247,136 @@ const CheckoutScreen = () => {
           </TouchableOpacity>
           <Text style={styles.headerTitle}>My Cart</Text>
         </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Delivery Address</Text>
-          <TouchableOpacity style={styles.addressButton}>
-            <Text style={styles.addressButtonText}>Select Address</Text>
-            <Image source={require('../assets/images/checkout_screen/arrow-right-icon.png')} style={styles.arrowIcon} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Overview</Text>
-          <View style={styles.overviewContainer}>
-            {items.map((item) => renderItem({ item }))}
+        {items.length === 0 ? (
+          <View style={styles.emptyCartContainer}>
+            <Image source={require('../assets/images/checkout_screen/empty-cart.png')} style={styles.emptyCartImage} />
+            <Text style={styles.emptyCartText}>Your Cart is Feeling Empty!</Text>
           </View>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Applied Coupon</Text>
-          <TouchableOpacity style={styles.couponButton} onPress={handleApplyCoupon}>
-            <Text style={styles.couponButtonText}>Apply Coupon</Text>
-            <Image source={require('../assets/images/checkout_screen/arrow-right-icon.png')} style={styles.arrowIcon} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Bill Details</Text>
-          <View style={styles.billDetailsContainer}>
-            <View style={styles.billItem}>
-              <Text style={styles.billItemText}>Item Total</Text>
-              <Text style={styles.billItemText}>₹ {itemTotal.toFixed(2)}</Text>
+        ) : (
+          <>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Delivery Address</Text>
+              {loading ? (
+                <SkeletonPlaceholder>
+                  <SkeletonPlaceholder.Item width="100%" height={50} borderRadius={10} />
+                </SkeletonPlaceholder>
+              ) : selectedAddress ? (
+                <View style={styles.addressContainer}>
+                  <View>
+                    <Text style={styles.addressTitle}>{selectedAddress.title}</Text>
+                    <Text style={styles.addressDetails}>{selectedAddress.details}</Text>
+                  </View>
+                  <TouchableOpacity onPress={() => navigation.navigate('AddressBook')}>
+                    <Image source={require('../assets/images/checkout_screen/edit-icon.png')} style={styles.editIcon} />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity style={styles.addressButton} onPress={() => navigation.navigate('AddressBook')}>
+                  <Text style={styles.addressButtonText}>Select Address</Text>
+                  <Image source={require('../assets/images/checkout_screen/arrow-right-icon.png')} style={styles.arrowIcon} />
+                </TouchableOpacity>
+              )}
             </View>
-            <View style={styles.billItem}>
-              <Text style={styles.billItemText}>Delivery Fee</Text>
-              <Text style={styles.billItemText}>₹ {deliveryFee.toFixed(2)}</Text>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Overview</Text>
+              <Text style={styles.pharmacyName}>Ordering from - {pharmacyName}</Text>
+              {loading ? (
+                <SkeletonPlaceholder>
+                  {Array(3).fill(0).map((_, index) => (
+                    <SkeletonPlaceholder.Item key={index} width="100%" height={80} borderRadius={10} marginBottom={10} />
+                  ))}
+                </SkeletonPlaceholder>
+              ) : (
+                <View style={styles.overviewContainer}>
+                  {items.map((item) => renderItem({ item }))}
+                </View>
+              )}
             </View>
-            <View style={styles.billItem}>
-              <Text style={styles.billItemText}>Discount</Text>
-              <Text style={styles.billItemText}>- ₹ {discount.toFixed(2)}</Text>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Coupon</Text>
+              {loading ? (
+                <SkeletonPlaceholder>
+                  <SkeletonPlaceholder.Item width="100%" height={50} borderRadius={10} marginBottom={10} />
+                </SkeletonPlaceholder>
+              ) : couponCode ? (
+                <View style={styles.couponApplied}>
+                  <Text style={styles.couponAppliedText}>Coupon applied: {couponCode}</Text>
+                  <TouchableOpacity onPress={removeCoupon}>
+                    <Text style={styles.removeCouponText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity style={styles.couponButton} onPress={handleApplyCoupon}>
+                  <Text style={styles.couponButtonText}>Apply Coupon</Text>
+                  <Image source={require('../assets/images/checkout_screen/arrow-right-icon.png')} style={styles.arrowIcon} />
+                </TouchableOpacity>
+              )}
             </View>
-            <View style={styles.billItem}>
-              <Text style={styles.billItemText}>To Pay</Text>
-              <Text style={styles.billItemText}>₹ {toPay.toFixed(2)}</Text>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Bill Details</Text>
+              {loading ? (
+                <SkeletonPlaceholder>
+                  <SkeletonPlaceholder.Item width="100%" height={150} borderRadius={10} />
+                </SkeletonPlaceholder>
+              ) : (
+                <View style={styles.billDetailsContainer}>
+                  <View style={styles.billItem}>
+                    <Text style={styles.billItemText}>Item Total</Text>
+                    <Text style={styles.billItemText}>
+                      ₹ {itemTotal.toFixed(2)}
+                    </Text>
+                  </View>
+                  <View style={styles.dottedLine} />
+                  <View style={styles.billItem}>
+                    <Text style={styles.billItemText}>Delivery Fee</Text>
+                    <Text style={styles.billItemText}>
+                      {deliveryDiscount ? <Text style={styles.strikeThrough}>₹ {deliveryFee.toFixed(2)}</Text> : null}
+                      ₹ {deliveryDiscount ? 0 : deliveryFee.toFixed(2)}
+                    </Text>
+                  </View>
+                  <View style={styles.billItem}>
+                    <Text style={styles.billItemText}>Discount</Text>
+                    <Text style={styles.billItemText}>- ₹ {discount.toFixed(2)}</Text>
+                  </View>
+                  <View style={styles.billItem}>
+                    <Text style={styles.billItemText}>To Pay</Text>
+                    <Text style={styles.billItemText}>
+                      {discount ? <Text style={styles.strikeThrough}>₹ {itemTotal + deliveryFee}</Text> : null}
+                      ₹ {finalToPay.toFixed(2)}
+                    </Text>
+                  </View>
+                  <View style={styles.dottedLine} />
+                  <View style={styles.billItem}>
+                    <Text style={styles.billItemText}>Payment Method</Text>
+                    <TouchableOpacity onPress={handlePaymentMethodChange} style={styles.paymentMethodContainer}>
+                      <Text style={styles.billItemText}>{paymentMethod}</Text>
+                      <Text style={styles.changeText}>Change</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
             </View>
-            <View style={styles.billItem}>
-              <Text style={styles.billItemText}>Payment Method</Text>
-              <TouchableOpacity onPress={handlePaymentMethodChange} style={styles.paymentMethodContainer}>
-                <Text style={styles.billItemText}>{paymentMethod}</Text>
-                <Text style={styles.changeText}>Change</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
+          </>
+        )}
       </ScrollView>
-      <TouchableOpacity style={styles.placeOrderButton} onPress={handlePlaceOrder}>
-        <Text style={styles.placeOrderButtonText}>Place Order</Text>
-        <Image source={require('../assets/images/checkout_screen/arrow-right-icon.png')} style={styles.arrowIcon} />
-      </TouchableOpacity>
+      {loading ? (
+        <SkeletonPlaceholder>
+          <SkeletonPlaceholder.Item width="90%" height={50} borderRadius={10} alignSelf="center" marginVertical={10} />
+        </SkeletonPlaceholder>
+      ) : items.length > 0 ? (
+        <TouchableOpacity style={styles.placeOrderButton} onPress={handlePlaceOrder}>
+          <Text style={styles.placeOrderButtonText}>Place Order</Text>
+          <Image source={require('../assets/images/pharmacy_shop_screen/order-now-icon.png')} style={styles.arrowIcon} />
+        </TouchableOpacity>
+      ) : null}
     </SafeAreaView>
-  );
+  );  
 };
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFF', // Change background color to white
   },
   container: {
     flex: 1,
@@ -215,7 +402,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: RFPercentage(3),
     fontFamily: 'Montserrat-Bold',
-    color: '#1B2E39',
+    color: '#178A80',
   },
   section: {
     backgroundColor: '#FFFFFF',
@@ -225,13 +412,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: RFPercentage(2.2),
     fontFamily: 'Montserrat-Bold',
-    color: '#26424D',
+    color: '#000',
     marginBottom: 10,
   },
   addressButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#26424D',
+    backgroundColor: '#1A998E',
     borderRadius: 10,
     paddingVertical: 20,
     paddingHorizontal: 20,
@@ -245,6 +432,31 @@ const styles = StyleSheet.create({
   arrowIcon: {
     width: 20,
     height: 20,
+    resizeMode: 'contain',
+  },
+  addressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#E0F7FA',
+    borderRadius: 10,
+    padding: 20,
+  },
+  addressTitle: {
+    fontSize: RFPercentage(2.2),
+    fontFamily: 'Montserrat-Bold',
+    color: '#00796B',
+  },
+  addressDetails: {
+    fontSize: RFPercentage(2),
+    fontFamily: 'Montserrat-Regular',
+    color: '#00796B',
+    marginTop: 4,
+  },
+  editIcon: {
+    width: 20,
+    height: 20,
+    tintColor: '#00796B',
     resizeMode: 'contain',
   },
   overviewContainer: {
@@ -263,19 +475,20 @@ const styles = StyleSheet.create({
   },
   medicineName: {
     flex: 2,
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.6),
     fontFamily: 'Montserrat-Medium',
     color: '#26424D',
+    flexShrink: 1, // Allows text to shrink if necessary
   },
   medicineCounter: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-around',
   },
   counterButton: {
-    width: 30,
-    height: 30,
+    width: 24,
+    height: 24,
     borderRadius: 15,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
@@ -284,28 +497,29 @@ const styles = StyleSheet.create({
     borderColor: '#26424D',
   },
   counterButtonText: {
-    fontSize: RFPercentage(2.5),
+    fontSize: RFPercentage(1.6),
     color: '#26424D',
     fontFamily: 'Montserrat-Bold',
   },
   counterText: {
     width: 30,
     textAlign: 'center',
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.6),
     color: '#26424D',
     fontFamily: 'Montserrat-Medium',
   },
   medicinePrice: {
     flex: 1,
     textAlign: 'right',
-    fontSize: RFPercentage(2),
+    fontSize: RFPercentage(1.6),
     fontFamily: 'Montserrat-Medium',
     color: '#26424D',
+    marginLeft: 10,
   },
   couponButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#26424D',
+    backgroundColor: '#1A998E',
     borderRadius: 10,
     paddingVertical: 20,
     paddingHorizontal: 20,
@@ -315,6 +529,25 @@ const styles = StyleSheet.create({
     fontSize: RFPercentage(2.2),
     fontFamily: 'Montserrat-Bold',
     color: '#FFFFFF',
+  },
+  couponApplied: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#E0F7FA',
+    borderRadius: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+  },
+  couponAppliedText: {
+    fontSize: RFPercentage(2.2),
+    fontFamily: 'Montserrat-Bold',
+    color: '#00796B',
+  },
+  removeCouponText: {
+    fontSize: RFPercentage(2.5),
+    fontFamily: 'Montserrat-Bold',
+    color: '#00796B',
   },
   billDetailsContainer: {
     backgroundColor: '#FFFFFF',
@@ -341,7 +574,7 @@ const styles = StyleSheet.create({
     color: '#26424D',
   },
   changeText: {
-    color: '#26424D',
+    color: '#1A998E',
     fontSize: RFPercentage(2),
     fontFamily: 'Montserrat-Medium',
     textDecorationLine: 'underline',
@@ -350,7 +583,7 @@ const styles = StyleSheet.create({
   placeOrderButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4AA366',
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 20,
@@ -373,9 +606,49 @@ const styles = StyleSheet.create({
   skeletonContainer: {
     padding: 20,
     backgroundColor: '#FFFFFF',
-    marginBottom: 10,
+    marginBottom: 30,
     borderRadius: 10,
   },
+  dottedLine: {
+    borderStyle: 'dotted',
+    borderWidth: 1,
+    borderRadius: 1,
+    borderColor: '#d3d3d3',
+    marginVertical: 10,
+  },
+  strikeThrough: {
+    textDecorationLine: 'line-through',
+    textDecorationStyle: 'solid',
+    color: 'red',
+  },
+  emptyCartContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF', // Ensure background is white
+  },
+  emptyCartImage: {
+    width: 200,
+    height: 200,
+    resizeMode: 'contain',
+    marginBottom: 20, // Add margin to space out the image and text
+  },
+  emptyCartText: {
+    fontSize: RFPercentage(2.5),
+    fontFamily: 'Montserrat-Regular',
+    color: '#1B2E39',
+    textAlign: 'center', // Center the text
+  },
+  pharmacyName: {
+    fontSize: RFPercentage(1.6),
+    color: '#C4C4C4',
+    fontFamily: 'Montserrat-SemiBold',
+    marginBottom: 10,
+  },
+  
 });
 
 export default CheckoutScreen;
+function showAsyncStorageContentInDev(): any {
+  throw new Error('Function not implemented.');
+}
